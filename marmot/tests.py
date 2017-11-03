@@ -39,6 +39,21 @@ class BaseTest(unittest.TestCase):
         Base.metadata.drop_all(self.engine)
 
 
+class TestJSONModel(BaseTest):
+
+    def setUp(self):
+        super(TestJSONModel, self).setUp()
+        self.init_database()
+
+    def test_well_formed_json(self):
+        from .models import Resource
+        body = '''{"foo": "bar"}'''
+        instance = Resource(body=body)
+        with transaction.manager:
+            self.session.add(instance)
+            transaction.commit()
+
+
 class TestMyViewSuccessCondition(BaseTest):
 
     def setUp(self):

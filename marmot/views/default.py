@@ -6,6 +6,34 @@ from sqlalchemy.exc import DBAPIError
 from ..models import MyModel
 
 
+CITIES = {
+    'paris': {
+        'name': 'Paris',
+        'population': '2,234,105'
+    },
+    'sf': {
+        'name': 'San Francisco',
+        'population': '812,826'
+    }
+}
+
+
+@view_config(route_name='city', renderer='json')
+def city(request):
+    name = request.matchdict['name']
+    return CITIES[name]
+
+
+@view_config(route_name='cities', renderer='json')
+def cities(request):
+    return Response("Collection of cities!\n")
+
+
+@view_config(route_name='foo', renderer='json')
+def foo_view(request):
+    import pdb; pdb.set_trace()
+
+
 @view_config(route_name='home', renderer='../templates/mytemplate.jinja2')
 def my_view(request):
     try:
