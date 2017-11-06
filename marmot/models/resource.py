@@ -14,15 +14,14 @@ from .meta import Base
 
 class Resource(Base):
     __tablename__ = 'resource'
+    type = Column(Text, primary_key=True)
     id = Column(Integer, primary_key=True)
     # rev = Column(Integer)
-    # schema = Column(Text)
-    body = Column(Text)
+    body = Column(Text, server_default="'{}'")
 
     @validates('body')
-    def validate_json(self, key, value):
+    def well_formed_json(self, key, value):
         json.loads(value)
         return value
-
 
 # Index('my_index', MyModel.name, unique=True, mysql_length=255)
