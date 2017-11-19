@@ -5,8 +5,11 @@ import zope.sqlalchemy
 
 # import or define all models here to ensure they are attached to the
 # Base.metadata prior to any initialization routines
-from .mymodel import MyModel  # flake8: noqa
-from .resource import Resource  # flake8: noqa
+from .resource import models  # flake8: noqa
+
+# add all of the imported models to the local namespace
+models = dict([(m.__name__, m) for m in models])
+locals().update(models)
 
 # run configure_mappers after defining all of the models to ensure
 # all relationships can be setup

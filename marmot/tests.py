@@ -1,17 +1,15 @@
 import unittest
 import transaction
+from jsonschema.exceptions import SchemaError
 
 from pyramid import testing
 
 
-def dummy_request(dbsession):
-    return testing.DummyRequest(dbsession=dbsession)
-
-
 class BaseTest(unittest.TestCase):
+
     def setUp(self):
         self.config = testing.setUp(settings={
-            'sqlalchemy.url': 'sqlite:///:memory:'
+            'sqlalchemy.url': 'postgresql://marmot_app:devPass789@localhost:5432/marmot'  # noqa
         })
         self.config.include('.models')
         settings = self.config.get_settings()
@@ -39,42 +37,21 @@ class BaseTest(unittest.TestCase):
         Base.metadata.drop_all(self.engine)
 
 
-class TestJSONModel(BaseTest):
+class TestModels(BaseTest):
 
     def setUp(self):
-        super(TestJSONModel, self).setUp()
+        super().setUp()
         self.init_database()
 
-    def test_well_formed_json(self):
-        from .models import Resource
-        body = '''{"foo": "bar"}'''
-        instance = Resource(body=body)
-        with transaction.manager:
-            self.session.add(instance)
-            transaction.commit()
-
-
-class TestMyViewSuccessCondition(BaseTest):
-
-    def setUp(self):
-        super(TestMyViewSuccessCondition, self).setUp()
-        self.init_database()
-
-        from .models import MyModel
-
-        model = MyModel(name='one', value=55)
-        self.session.add(model)
-
-    def test_passing_view(self):
-        from .views.default import my_view
-        info = my_view(dummy_request(self.session))
-        self.assertEqual(info['one'].name, 'one')
-        self.assertEqual(info['project'], 'Marmot')
-
-
-class TestMyViewFailureCondition(BaseTest):
-
-    def test_failing_view(self):
-        from .views.default import my_view
-        info = my_view(dummy_request(self.session))
-        self.assertEqual(info.status_int, 500)
+    def test_schema_validation(self):
+        from .models import Schemas
+        body = '''[]'''
+        expected = None
+        try:
+            instance = Schemas(name='test_invalid', rev='1', body=body)
+        except Exception as exc:
+            expected = exc
+        assert type(expected) == SchemaError
+        # with transaction.manager:
+        #     self.session.add(instance)
+        #     transaction.commit()
