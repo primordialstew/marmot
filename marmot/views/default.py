@@ -2,11 +2,15 @@
 from pyramid.view import view_defaults
 from pyramid.view import view_config
 
+from slugify import slugify
+
 # from sqlalchemy.exc import DBAPIError
+from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy import func
 
 import transaction
 
-from ..models import Schemas
+from marmot.models import Schemas
 
 
 def includeme(config):
@@ -26,21 +30,53 @@ class RESTResource(object):
         self.request = request
 
 
+class SchemaQuery(object):
+
+    model = Schemas
+
+    def latest(query):
+        query = query.filter(Schemas.end.is_(None))
+        return query
+
+    def get(query, name=None):
+        assert name
+        query = query.filter(Schemas.name == name)
+        return query
+
+
 @view_defaults(route_name='schemas', renderer='json')
 class SchemasResource(RESTResource):
 
     view_name = 'schemas'
 
+    @view_config(request_method='GET', route_name='schemas')
+    def get(self):
+        session = self.request.dbsession
+        query = session.query(Schemas).filter(Schemas.end.is_(None))
+        schemas = query.all()
+        response = self.request.response
+        response.json = schemas
+        return response
+
     @view_config(request_method='POST', route_name='schemas')
     def create(self):
         document = dict(self.request.json)
-        name = document['title']
+        name = slugify(document['title'])
+        session = self.request.dbsession
         with transaction.manager:
-            record = Schemas(
+            query = session.query(Schemas)
+            query = SchemaQuery.latest(query)
+            query = SchemaQuery.get(query, name=name)
+            latest = query.one()
+            latest.end = func.now()
+            session.add(latest)
+
+            new_rev = Schemas(
                 name=name,
                 body=document,
+                rev=latest.rev + 1,
             )
-            self.request.dbsession.add(record)
+            self.request.dbsession.add(new_rev)
 
         return self.request.response
 

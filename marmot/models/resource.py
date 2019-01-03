@@ -6,7 +6,10 @@ from sqlalchemy import (
     Index,
     Text,
 )
-from sqlalchemy.schema import ForeignKeyConstraint
+from sqlalchemy.schema import (
+    Sequence,
+    ForeignKeyConstraint,
+)
 from sqlalchemy.sql import func
 from sqlalchemy.orm import validates
 from sqlalchemy.dialects.postgresql import JSONB
@@ -17,9 +20,10 @@ from .meta import Base
 class Schemas(Base):
 
     __tablename__ = 'schemas'
+    __table_args__ = {'schema': 'resources'}
 
     name = Column(Text, primary_key=True)
-    rev = Column(Integer, primary_key=True)
+    rev = Column(Integer, primary_key=True, server_default='1')
     start = Column(DateTime, nullable=False, server_default=func.now())
     end = Column(DateTime)
     body = Column(JSONB, server_default="{}")
@@ -43,8 +47,8 @@ class Resource(Base):
 
     schema_name = Column(Text, nullable=False)
     schema_rev = Column(Integer, nullable=False)
-    id = Column(Integer, primary_key=True)
-    rev = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, server_default=1)
+    rev = Column(Integer, primary_key=True, server_default=1)
     start = Column(DateTime, nullable=False, server_default=func.now())
     end = Column(DateTime)
     body = Column(JSONB, server_default="{}")

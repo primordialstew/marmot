@@ -14,7 +14,7 @@ class BaseTest(unittest.TestCase):
         self.config.include('.models')
         settings = self.config.get_settings()
 
-        from .models import (
+        from mammoth.models import (
             get_engine,
             get_session_factory,
             get_tm_session,
@@ -26,14 +26,14 @@ class BaseTest(unittest.TestCase):
         self.session = get_tm_session(session_factory, transaction.manager)
 
     def init_database(self):
-        from .models.meta import Base
+        from mammoth.models.meta import Base
         Base.metadata.create_all(self.engine)
 
     def tearDown(self):
-        from .models.meta import Base
+        from mammoth.models.meta import Base
 
         testing.tearDown()
-        transaction.abort()
+        # transaction.abort()
         Base.metadata.drop_all(self.engine)
 
 
