@@ -31,3 +31,28 @@ Getting Started
 - Run your project.
 
     env/bin/pserve development.ini
+
+
+## Design
+
+Primary concepts: resources, representations, types
+
+- A resource is object representing a "named thing"
+- A representation is an instance
+- A type defines a resource, including its parameters
+
+
+### Requirements, ideas, scratch notes
+
+* REST resources
+* CRUD on resources
+* resource linking
+* optional linked resource expansion
+* bulk requests (SCIM style)
+* query string translation to backend query
+* schema validation
+* revisioning of resources
+* logging
+* unit tests
+* functional tests
+* CLI
