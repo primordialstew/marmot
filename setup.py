@@ -10,6 +10,8 @@ with open(os.path.join(here, 'CHANGES.md')) as f:
     CHANGES = f.read()
 
 requires = [
+    'alembic',
+    'Psycopg2',
     'SQLAlchemy',
 ]
 
