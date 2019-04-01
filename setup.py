@@ -11,7 +11,7 @@ with open(os.path.join(here, 'CHANGES.md')) as f:
 
 requires = [
     'alembic',
-    'Psycopg2',
+    'psycopg2-binary',
     'SQLAlchemy',
 ]
 
