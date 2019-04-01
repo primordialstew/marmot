@@ -33,6 +33,14 @@ Getting Started
     env/bin/pserve development.ini
 
 
+## Project standards
+- Test coverage
+- Linting requirements
+- Working on branches
+- Merging policy
+- Opinionated autoformatter?
+
+
 ## Design
 
 Primary concepts: resources, representations, types
